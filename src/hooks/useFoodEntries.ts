@@ -23,9 +23,8 @@ export const useFoodEntries = (date?: Date) => {
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
 
-  // Flag to determine if we should use the API or local storage
-  // For now, just use localStorage regardless of authentication status
-  const useApi = false; // isAuthenticated;
+  // Use the API when authenticated, otherwise fall back to localStorage
+  const useApi = isAuthenticated;
 
   const fetchEntries = useCallback(async () => {
     setLoading(true);

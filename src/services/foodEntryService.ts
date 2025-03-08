@@ -81,6 +81,23 @@ export const deleteFoodEntry = (id: string): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEntries));
 };
 
+// Update a food entry
+export const updateFoodEntry = (id: string, updatedData: Partial<FoodEntry>): FoodEntry | null => {
+  const entries = getAllFoodEntries();
+  const index = entries.findIndex(entry => entry.id === id);
+  
+  if (index === -1) {
+    return null;
+  }
+  
+  // Create updated entry
+  const updatedEntry = { ...entries[index], ...updatedData };
+  entries[index] = updatedEntry;
+  
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  return updatedEntry;
+};
+
 // Get food entries for a specific date
 export const getFoodEntriesByDate = (date: Date): FoodEntry[] => {
   const formattedDate = format(date, 'yyyy-MM-dd');
@@ -197,6 +214,7 @@ export default {
   getAllFoodEntries,
   addFoodEntry,
   deleteFoodEntry,
+  updateFoodEntry,
   getFoodEntriesByDate,
   getTotalCaloriesByDate,
   getCurrentWeekFoodEntries,
