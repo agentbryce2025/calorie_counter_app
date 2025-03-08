@@ -5,39 +5,47 @@ import FoodEntryForm from './ui/food-entry-form';
 import ProgressBar from './ui/progress-bar';
 import CalendarView from './ui/calendar-view';
 import DailyTimeline from './ui/daily-timeline';
+import ApiStats from './ApiStats';
+import ErrorMessage from './ui/ErrorMessage';
 import * as foodEntryService from '../services/foodEntryService';
 import * as preferencesService from '../services/preferencesService';
+import useFoodEntries from '../hooks/useFoodEntries';
 
 const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
-  const [foodEntries, setFoodEntries] = useState<foodEntryService.FoodEntry[]>([]);
+  const { 
+    entries: foodEntries, 
+    addEntry, 
+    deleteEntry, 
+    loading, 
+    error,
+    fetchEntries 
+  } = useFoodEntries(selectedDate);
   const [weeklyData, setWeeklyData] = useState<{ name: string; calories: number }[]>([]);
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [calorieGoal, setCalorieGoal] = useState<number>(preferencesService.getDailyCalorieGoal());
   
-  // Load data for the selected date
+  // Fetch weekly and monthly data
   useEffect(() => {
-    loadData();
-  }, [selectedDate]);
-  
-  const loadData = () => {
-    const entries = foodEntryService.getFoodEntriesByDate(selectedDate);
     const weekly = foodEntryService.getWeeklyCalorieData(selectedDate);
     const monthly = foodEntryService.getMonthlyCalorieData(selectedDate, calorieGoal);
     
-    setFoodEntries(entries);
     setWeeklyData(weekly);
     setMonthlyData(monthly);
+  }, [selectedDate, calorieGoal, foodEntries]);
+  
+  const handleAddFood = async (name: string, calories: number, mealType: string) => {
+    const entry = {
+      name,
+      calories,
+      mealType,
+      timestamp: new Date().toISOString()
+    };
+    await addEntry(entry);
   };
   
-  const handleAddFood = (entry: Omit<foodEntryService.FoodEntry, 'id'>) => {
-    foodEntryService.addFoodEntry(entry);
-    loadData();
-  };
-  
-  const handleDeleteEntry = (id: string) => {
-    foodEntryService.deleteFoodEntry(id);
-    loadData();
+  const handleDeleteEntry = async (id: string) => {
+    await deleteEntry(id);
   };
   
   const handleDateSelect = (date: Date) => {
@@ -48,6 +56,24 @@ const Dashboard: React.FC = () => {
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Error message */}
+      {error && (
+        <div className="col-span-full">
+          <ErrorMessage 
+            error={error instanceof Error ? error : new Error(String(error))} 
+            onRetry={fetchEntries}
+          />
+        </div>
+      )}
+
+      {/* Loading indicator */}
+      {loading && (
+        <div className="col-span-full flex justify-center items-center p-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          <span className="ml-2">Loading data...</span>
+        </div>
+      )}
+
       {/* Left column */}
       <div className="md:col-span-2 space-y-6">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
@@ -98,6 +124,8 @@ const Dashboard: React.FC = () => {
           foodEntries={monthlyData}
           onSelectDate={handleDateSelect}
         />
+        
+        <ApiStats darkMode={false} />
       </div>
     </div>
   );

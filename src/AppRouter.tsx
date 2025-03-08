@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ApiTestPage from './pages/ApiTestPage';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -18,6 +19,14 @@ const AppRouter: React.FC = () => {
             element={
               <ProtectedRoute>
                 <App />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/api-test"
+            element={
+              <ProtectedRoute>
+                <ApiTestPage />
               </ProtectedRoute>
             }
           />

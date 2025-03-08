@@ -37,10 +37,10 @@ export const useFoodEntries = (date?: Date) => {
         
         if (formattedDate) {
           response = await apiService.fetchFoodEntriesByDate(formattedDate);
-          setEntries(response.entries);
+          setEntries(response.entries || []);
         } else {
           response = await apiService.fetchFoodEntries();
-          setEntries(response.entries);
+          setEntries(response.entries || []);
         }
       } else {
         // Use localStorage service as fallback
@@ -50,14 +50,34 @@ export const useFoodEntries = (date?: Date) => {
         setEntries(localEntries);
       }
     } catch (err) {
-      setError('Failed to fetch food entries');
-      console.error(err);
+      // Store the actual error object instead of just a string
+      console.error('Error fetching entries:', err);
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error('Failed to fetch food entries'));
+      }
+      
+      // If API fails, try to fall back to localStorage as a backup
+      if (useApi) {
+        try {
+          console.log('Falling back to localStorage after API failure');
+          const localEntries = date 
+            ? foodEntryService.getFoodEntriesByDate(date) 
+            : foodEntryService.getAllFoodEntries();
+          setEntries(localEntries);
+        } catch (fallbackErr) {
+          console.error('Fallback to localStorage also failed:', fallbackErr);
+        }
+      }
     } finally {
       setLoading(false);
     }
   }, [date, useApi]);
 
   const addEntry = async (newEntry: NewFoodEntry): Promise<FoodEntry | null> => {
+    setLoading(true);
+    setError(null);
     try {
       if (useApi) {
         const response = await apiService.createFoodEntry(newEntry);
@@ -69,31 +89,71 @@ export const useFoodEntries = (date?: Date) => {
         return entry;
       }
     } catch (err) {
-      setError('Failed to add food entry');
-      console.error(err);
+      console.error('Error adding food entry:', err);
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error('Failed to add food entry'));
+      }
+      
+      // Try local storage as fallback
+      if (useApi) {
+        try {
+          console.log('Falling back to localStorage after API failure on add');
+          const entry = foodEntryService.addFoodEntry(newEntry);
+          await fetchEntries(); // Refresh the list
+          return entry;
+        } catch (fallbackErr) {
+          console.error('Fallback to localStorage also failed on add:', fallbackErr);
+        }
+      }
       return null;
+    } finally {
+      setLoading(false);
     }
   };
 
   const updateEntry = async (id: string, updatedEntry: Partial<FoodEntry>): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
     try {
       if (useApi) {
         await apiService.updateFoodEntry(id, updatedEntry);
         await fetchEntries(); // Refresh the list
         return true;
       } else {
-        // Not implemented in local storage service yet
-        console.warn('Update not implemented in localStorage service');
-        return false;
+        const result = foodEntryService.updateFoodEntry(id, updatedEntry);
+        await fetchEntries(); // Refresh the list
+        return result !== null;
       }
     } catch (err) {
-      setError('Failed to update food entry');
-      console.error(err);
+      console.error('Error updating food entry:', err);
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error('Failed to update food entry'));
+      }
+      
+      // Try local storage as fallback
+      if (useApi) {
+        try {
+          console.log('Falling back to localStorage after API failure on update');
+          const result = foodEntryService.updateFoodEntry(id, updatedEntry);
+          await fetchEntries(); // Refresh the list
+          return result !== null;
+        } catch (fallbackErr) {
+          console.error('Fallback to localStorage also failed on update:', fallbackErr);
+        }
+      }
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
   const deleteEntry = async (id: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
     try {
       if (useApi) {
         await apiService.deleteFoodEntry(id);
@@ -105,9 +165,27 @@ export const useFoodEntries = (date?: Date) => {
         return true;
       }
     } catch (err) {
-      setError('Failed to delete food entry');
-      console.error(err);
+      console.error('Error deleting food entry:', err);
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error('Failed to delete food entry'));
+      }
+      
+      // Try local storage as fallback
+      if (useApi) {
+        try {
+          console.log('Falling back to localStorage after API failure on delete');
+          foodEntryService.deleteFoodEntry(id);
+          await fetchEntries(); // Refresh the list
+          return true;
+        } catch (fallbackErr) {
+          console.error('Fallback to localStorage also failed on delete:', fallbackErr);
+        }
+      }
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
