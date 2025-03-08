@@ -23,19 +23,24 @@ const FoodEntryForm = ({ darkMode, onAddFood }: FoodEntryFormProps) => {
       <h2 className="text-xl font-bold mb-4">Add Food Item</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block mb-2">Food Name</label>
+          <label htmlFor="foodName" className="block mb-2">Food Name</label>
           <input 
+            id="foodName"
+            name="foodName"
             type="text" 
             value={foodName}
             onChange={(e) => setFoodName(e.target.value)}
             className={`w-full p-2 rounded-md ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'}`}
             placeholder="Enter food name"
             required
+            aria-required="true"
           />
         </div>
         <div>
-          <label className="block mb-2">Calories</label>
+          <label htmlFor="calories" className="block mb-2">Calories</label>
           <input 
+            id="calories"
+            name="calories"
             type="number"
             value={calories}
             onChange={(e) => setCalories(e.target.value)} 
@@ -43,6 +48,7 @@ const FoodEntryForm = ({ darkMode, onAddFood }: FoodEntryFormProps) => {
             placeholder="Enter calories"
             required
             min="1"
+            aria-required="true"
           />
         </div>
       </div>

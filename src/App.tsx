@@ -6,6 +6,7 @@ import CalorieTable from './components/CalorieTable';
 import CalendarView from './components/CalendarView';
 import DailyDetail from './components/DailyDetail';
 import DailyTimeline from './components/DailyTimeline';
+import Navbar from './components/auth/Navbar';
 import { format, isSameDay, addDays, isToday, subDays } from 'date-fns';
 import { 
   getAllFoodEntries, 
@@ -111,9 +112,8 @@ function App() {
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="max-w-4xl mx-auto bg-opacity-95 min-h-screen pb-10">
         {/* Header */}
-        <header className="p-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Calorie Tracker</h1>
-          <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center">
             <button 
               onClick={() => setActiveView(activeView === 'daily' ? 'analytics' : 'daily')}
               className={`px-3 py-1.5 rounded-md ${
@@ -140,15 +140,11 @@ function App() {
                 )}
               </span>
             </button>
-            <button 
-              onClick={toggleDarkMode}
-              className={`p-2 rounded-md ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {darkMode ? '☀️' : '🌙'}
-            </button>
           </div>
-        </header>
+        </div>
+        
+        {/* Import the Navbar component at the top of the file */}
+        <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
 
         <main className="px-6">
           {activeView === 'daily' ? (
