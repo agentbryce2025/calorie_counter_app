@@ -88,10 +88,12 @@ export const getFoodSummaryValidator = [
     .notEmpty().withMessage('End date is required')
     .isISO8601().withMessage('End date must be a valid ISO8601 date format (YYYY-MM-DD)')
     .custom((endDate, { req }) => {
-      const startDate = new Date(req.query.startDate as string);
-      const end = new Date(endDate);
-      if (end < startDate) {
-        throw new Error('End date must be after start date');
+      if (req.query && req.query.startDate) {
+        const startDate = new Date(req.query.startDate as string);
+        const end = new Date(endDate);
+        if (end < startDate) {
+          throw new Error('End date must be after start date');
+        }
       }
       return true;
     })

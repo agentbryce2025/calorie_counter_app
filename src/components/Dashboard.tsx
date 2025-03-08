@@ -34,14 +34,8 @@ const Dashboard: React.FC = () => {
     setMonthlyData(monthly);
   }, [selectedDate, calorieGoal, foodEntries]);
   
-  const handleAddFood = async (name: string, calories: number, mealType: string) => {
-    const entry = {
-      name,
-      calories,
-      mealType,
-      timestamp: new Date().toISOString()
-    };
-    await addEntry(entry);
+  const handleAddFood = async (food: { name: string; calories: number; timestamp: string; mealType: string }) => {
+    await addEntry(food);
   };
   
   const handleDeleteEntry = async (id: string) => {
@@ -60,7 +54,7 @@ const Dashboard: React.FC = () => {
       {error && (
         <div className="col-span-full">
           <ErrorMessage 
-            error={error instanceof Error ? error : new Error(String(error))} 
+            error={typeof error === 'string' ? new Error(error) : new Error('Unknown error')} 
             onRetry={fetchEntries}
           />
         </div>

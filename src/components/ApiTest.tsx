@@ -190,7 +190,7 @@ const ApiTest: React.FC = () => {
       
       {entriesError && (
         <div className="mb-6">
-          <ErrorMessage error={entriesError as Error} />
+          <ErrorMessage error={typeof entriesError === 'string' ? new Error(entriesError) : new Error('Unknown error')} />
         </div>
       )}
 

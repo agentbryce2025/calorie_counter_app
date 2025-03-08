@@ -94,7 +94,7 @@ const makeRequest = async <T>(
       // API errors are already formatted correctly, rethrow
       console.error(`API error (${error.status}):`, error.message);
       throw error;
-    } else if (error.name === 'AbortError') {
+    } else if (error instanceof Error && error.name === 'AbortError') {
       // Handle timeout
       console.error('Request timed out');
       throw new TimeoutError();

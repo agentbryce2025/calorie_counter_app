@@ -33,7 +33,7 @@ export const useFoodEntries = (date?: Date) => {
       if (useApi) {
         // Use the API service when authentication is ready
         const formattedDate = date ? new Date(date).toISOString().split('T')[0] : undefined;
-        let response;
+        let response: any;
         
         if (formattedDate) {
           response = await apiService.fetchFoodEntriesByDate(formattedDate);
@@ -53,9 +53,9 @@ export const useFoodEntries = (date?: Date) => {
       // Store the actual error object instead of just a string
       console.error('Error fetching entries:', err);
       if (err instanceof Error) {
-        setError(err);
+        setError(err.message);
       } else {
-        setError(new Error('Failed to fetch food entries'));
+        setError('Failed to fetch food entries');
       }
       
       // If API fails, try to fall back to localStorage as a backup
@@ -91,9 +91,9 @@ export const useFoodEntries = (date?: Date) => {
     } catch (err) {
       console.error('Error adding food entry:', err);
       if (err instanceof Error) {
-        setError(err);
+        setError(err.message);
       } else {
-        setError(new Error('Failed to add food entry'));
+        setError('Failed to add food entry');
       }
       
       // Try local storage as fallback
@@ -129,9 +129,9 @@ export const useFoodEntries = (date?: Date) => {
     } catch (err) {
       console.error('Error updating food entry:', err);
       if (err instanceof Error) {
-        setError(err);
+        setError(err.message);
       } else {
-        setError(new Error('Failed to update food entry'));
+        setError('Failed to update food entry');
       }
       
       // Try local storage as fallback
@@ -167,9 +167,9 @@ export const useFoodEntries = (date?: Date) => {
     } catch (err) {
       console.error('Error deleting food entry:', err);
       if (err instanceof Error) {
-        setError(err);
+        setError(err.message);
       } else {
-        setError(new Error('Failed to delete food entry'));
+        setError('Failed to delete food entry');
       }
       
       // Try local storage as fallback
