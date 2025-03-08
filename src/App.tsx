@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import CalorieChart from './components/CalorieChart';
 import FoodEntryForm from './components/FoodEntryForm';
@@ -7,57 +7,48 @@ import CalendarView from './components/CalendarView';
 import DailyDetail from './components/DailyDetail';
 import DailyTimeline from './components/DailyTimeline';
 import { format, isSameDay, addDays, isToday, subDays } from 'date-fns';
-
-// Dummy data for calorie tracking by day of week
-const initialChartData = [
-  { id: 1, day: "Monday", calories: 2100, goal: 2000 },
-  { id: 2, day: "Tuesday", calories: 1900, goal: 2000 },
-  { id: 3, day: "Wednesday", calories: 2200, goal: 2000 },
-  { id: 4, day: "Thursday", calories: 1850, goal: 2000 },
-  { id: 5, day: "Friday", calories: 2050, goal: 2000 },
-  { id: 6, day: "Saturday", calories: 2300, goal: 2000 },
-  { id: 7, day: "Sunday", calories: 1950, goal: 2000 },
-];
-
-// Dummy data for calendar view
-const generateCalendarData = () => {
-  const today = new Date();
-  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-  
-  return Array.from({ length: daysInMonth }, (_, i) => {
-    const day = i + 1;
-    const date = new Date(today.getFullYear(), today.getMonth(), day);
-    
-    // Create some variation in the data
-    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-    const baseCalories = isWeekend ? 2200 : 1900;
-    const variation = Math.floor(Math.random() * 500) - 200; // -200 to +300
-    
-    return {
-      id: day,
-      date: date,
-      calories: baseCalories + variation,
-      goal: 2000
-    };
-  });
-};
-
-interface FoodEntry {
-  id: number;
-  name: string;
-  calories: number;
-  date: Date;
-}
+import { 
+  getAllFoodEntries, 
+  addFoodEntry, 
+  deleteFoodEntry, 
+  getEntriesForDate,
+  getWeeklyCalorieData,
+  getMonthlyCalorieData,
+  FoodEntry 
+} from './services/foodEntryService';
+import {
+  getDarkModePreference,
+  saveDarkModePreference,
+  getCalorieGoal,
+  saveCalorieGoal
+} from './services/userPreferences';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(true);
-  const [calorieData, setCalorieData] = useState(initialChartData);
-  const [calendarData, setCalendarData] = useState(generateCalendarData());
+  // User preferences
+  const [darkMode, setDarkMode] = useState(getDarkModePreference());
+  const [calorieGoal, setCalorieGoal] = useState(getCalorieGoal());
+  
+  // View states
   const [activeView, setActiveView] = useState("daily"); // "daily" or "analytics"
   const [analyticsTab, setAnalyticsTab] = useState("daily"); // "daily", "weekly", "monthly"
-  const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-
+  
+  // Data states
+  const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([]);
+  const [calorieData, setCalorieData] = useState(getWeeklyCalorieData());
+  const [monthlyData, setMonthlyData] = useState(getMonthlyCalorieData());
+  
+  // Load food entries on mount
+  useEffect(() => {
+    setFoodEntries(getAllFoodEntries());
+  }, []);
+  
+  // Refresh the weekly data when entries change
+  useEffect(() => {
+    setCalorieData(getWeeklyCalorieData());
+    setMonthlyData(getMonthlyCalorieData());
+  }, [foodEntries]);
+  
   // Filter food entries for the selected date
   const foodsForSelectedDate = foodEntries.filter(entry => 
     isSameDay(entry.date, selectedDate)
@@ -67,12 +58,22 @@ function App() {
   const totalCaloriesForSelectedDate = foodsForSelectedDate.reduce(
     (sum, entry) => sum + entry.calories, 0
   );
-
-  // Get calorie goal for the selected date
-  const selectedDateCalorieGoal = 2000; // Default goal
   
   // Calculate remaining calories
-  const remainingCalories = selectedDateCalorieGoal - totalCaloriesForSelectedDate;
+  const remainingCalories = calorieGoal - totalCaloriesForSelectedDate;
+  
+  // Handle dark mode toggle
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    saveDarkModePreference(newMode);
+  };
+  
+  // Update calorie goal
+  const updateCalorieGoal = (goal: number) => {
+    setCalorieGoal(goal);
+    saveCalorieGoal(goal);
+  };
   
   // Navigate to previous day
   const goToPreviousDay = () => {
@@ -85,76 +86,25 @@ function App() {
   };
 
   const handleAddFood = (foodName: string, calories: number) => {
-    const newEntry: FoodEntry = {
-      id: Date.now(),
+    const entry = {
       name: foodName,
       calories: calories,
-      date: selectedDate // Use the currently selected date
+      date: selectedDate
     };
     
-    setFoodEntries([newEntry, ...foodEntries]);
+    // Add to database and get the new entry with ID
+    const newEntry = addFoodEntry(entry);
     
-    // Update the calendar data for the selected date
-    setCalendarData(prevData => 
-      prevData.map(item => {
-        if (isSameDay(item.date, selectedDate)) {
-          return {
-            ...item,
-            calories: item.calories + calories
-          };
-        }
-        return item;
-      })
-    );
-    
-    // Also update the chart data if it's today
-    const dayOfWeek = format(selectedDate, 'EEEE');
-    setCalorieData(prevData => 
-      prevData.map(item => {
-        if (item.day === dayOfWeek) {
-          return {
-            ...item,
-            calories: item.calories + calories
-          };
-        }
-        return item;
-      })
-    );
+    // Update local state
+    setFoodEntries(prevEntries => [newEntry, ...prevEntries]);
   };
 
   const handleDeleteFood = (id: number) => {
-    const entryToDelete = foodEntries.find(entry => entry.id === id);
-    if (!entryToDelete) return;
-
-    // Remove the entry
-    setFoodEntries(foodEntries.filter(entry => entry.id !== id));
+    // Delete from database
+    deleteFoodEntry(id);
     
-    // Update the calendar data to subtract the calories
-    setCalendarData(prevData => 
-      prevData.map(item => {
-        if (isSameDay(item.date, entryToDelete.date)) {
-          return {
-            ...item,
-            calories: item.calories - entryToDelete.calories
-          };
-        }
-        return item;
-      })
-    );
-    
-    // Also update the chart data if needed
-    const dayOfWeek = format(entryToDelete.date, 'EEEE');
-    setCalorieData(prevData => 
-      prevData.map(item => {
-        if (item.day === dayOfWeek) {
-          return {
-            ...item,
-            calories: item.calories - entryToDelete.calories
-          };
-        }
-        return item;
-      })
-    );
+    // Update local state
+    setFoodEntries(prevEntries => prevEntries.filter(entry => entry.id !== id));
   };
 
   return (
@@ -165,7 +115,7 @@ function App() {
           <h1 className="text-2xl font-bold">Calorie Tracker</h1>
           <div className="flex items-center space-x-4">
             <button 
-              onClick={() => setActiveView('analytics')}
+              onClick={() => setActiveView(activeView === 'daily' ? 'analytics' : 'daily')}
               className={`px-3 py-1.5 rounded-md ${
                 activeView === 'analytics' 
                   ? (darkMode ? 'bg-indigo-600 text-white' : 'bg-indigo-500 text-white') 
@@ -173,15 +123,27 @@ function App() {
               }`}
             >
               <span className="flex items-center">
-                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Analytics
+                {activeView === 'daily' ? (
+                  <>
+                    <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Analytics
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    Daily Log
+                  </>
+                )}
               </span>
             </button>
             <button 
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={toggleDarkMode}
               className={`p-2 rounded-md ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {darkMode ? '☀️' : '🌙'}
             </button>
@@ -191,11 +153,20 @@ function App() {
         <main className="px-6">
           {activeView === 'daily' ? (
             <>
+              {/* Calendar View */}
+              <CalendarView 
+                darkMode={darkMode}
+                selectedDate={selectedDate}
+                onDateSelect={(date) => setSelectedDate(date)}
+                calorieData={monthlyData}
+              />
+              
               {/* Date Navigation */}
               <div className="flex items-center justify-between mb-6">
                 <button 
                   onClick={goToPreviousDay}
                   className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
+                  aria-label="Previous day"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -212,6 +183,7 @@ function App() {
                 <button 
                   onClick={goToNextDay}
                   className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
+                  aria-label="Next day"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -221,22 +193,59 @@ function App() {
               
               {/* Calorie Progress Bar */}
               <div className="mb-8">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium">Daily Goal: {calorieGoal} calories</span>
+                  <button 
+                    onClick={() => {
+                      const newGoal = prompt("Enter your daily calorie goal:", calorieGoal.toString());
+                      if (newGoal && !isNaN(parseInt(newGoal, 10))) {
+                        updateCalorieGoal(parseInt(newGoal, 10));
+                      }
+                    }}
+                    className={`text-xs px-2 py-0.5 rounded ${
+                      darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    Edit Goal
+                  </button>
+                </div>
                 <div className="h-2 w-full bg-gray-300 rounded-full overflow-hidden mb-2">
                   <div 
-                    className="h-full bg-green-500 transition-all duration-300"
-                    style={{ width: `${Math.min((totalCaloriesForSelectedDate / selectedDateCalorieGoal) * 100, 100)}%` }}
+                    className={`h-full transition-all duration-300 ${
+                      totalCaloriesForSelectedDate > calorieGoal ? 'bg-red-500' : 'bg-green-500'
+                    }`}
+                    style={{ width: `${Math.min((totalCaloriesForSelectedDate / calorieGoal) * 100, 100)}%` }}
                   ></div>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>
                     <span className="font-medium">{totalCaloriesForSelectedDate}</span>
-                    <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}> / {selectedDateCalorieGoal} calories</span>
+                    <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}> / {calorieGoal} calories</span>
                   </span>
-                  <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                  <span className={`${
+                    remainingCalories > 0 
+                      ? (darkMode ? 'text-green-400' : 'text-green-600') 
+                      : (darkMode ? 'text-red-400' : 'text-red-600')
+                  }`}>
                     {remainingCalories > 0 ? `${remainingCalories} remaining` : `${Math.abs(remainingCalories)} over limit`}
                   </span>
                 </div>
               </div>
+              
+              {/* Daily Detail */}
+              <DailyDetail
+                foods={foodsForSelectedDate.map(entry => ({
+                  id: entry.id,
+                  name: entry.name,
+                  calories: entry.calories,
+                  time: entry.date
+                }))}
+                totalCalories={totalCaloriesForSelectedDate}
+                calorieGoal={calorieGoal}
+                selectedDate={selectedDate}
+                onDeleteFood={handleDeleteFood}
+                darkMode={darkMode}
+              />
               
               {/* Daily Timeline */}
               <DailyTimeline 
@@ -261,24 +270,24 @@ function App() {
               <div className="flex space-x-4 mb-4">
                 <button
                   className={`px-4 py-2 rounded-md ${analyticsTab === 'daily' 
-                    ? (darkMode ? 'bg-indigo-600' : 'bg-indigo-500 text-white') 
-                    : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
+                    ? (darkMode ? 'bg-indigo-600 text-white' : 'bg-indigo-500 text-white') 
+                    : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   onClick={() => setAnalyticsTab('daily')}
                 >
                   Daily
                 </button>
                 <button
                   className={`px-4 py-2 rounded-md ${analyticsTab === 'weekly' 
-                    ? (darkMode ? 'bg-indigo-600' : 'bg-indigo-500 text-white') 
-                    : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
+                    ? (darkMode ? 'bg-indigo-600 text-white' : 'bg-indigo-500 text-white') 
+                    : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   onClick={() => setAnalyticsTab('weekly')}
                 >
                   Weekly
                 </button>
                 <button
                   className={`px-4 py-2 rounded-md ${analyticsTab === 'monthly' 
-                    ? (darkMode ? 'bg-indigo-600' : 'bg-indigo-500 text-white') 
-                    : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
+                    ? (darkMode ? 'bg-indigo-600 text-white' : 'bg-indigo-500 text-white') 
+                    : (darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300')}`}
                   onClick={() => setAnalyticsTab('monthly')}
                 >
                   Monthly
@@ -286,10 +295,18 @@ function App() {
               </div>
 
               <div className={`h-64 rounded-lg mb-6 ${darkMode ? 'bg-gray-800' : 'bg-white border'}`}>
-                <CalorieChart data={calorieData} darkMode={darkMode} />
+                <CalorieChart 
+                  data={analyticsTab === 'monthly' ? monthlyData : calorieData} 
+                  darkMode={darkMode} 
+                  xAxisKey={analyticsTab === 'monthly' ? 'day' : 'day'}
+                />
               </div>
 
-              <CalorieTable data={calorieData} darkMode={darkMode} />
+              <CalorieTable 
+                data={analyticsTab === 'monthly' ? monthlyData : calorieData} 
+                darkMode={darkMode} 
+                period={analyticsTab}
+              />
               
               <div className="flex justify-between mt-6 mb-3">
                 <h2 className="text-xl font-bold">Complete Food Log</h2>
