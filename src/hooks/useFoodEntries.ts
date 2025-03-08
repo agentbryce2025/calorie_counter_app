@@ -82,7 +82,9 @@ export const useFoodEntries = (date?: Date) => {
       if (useApi) {
         const response = await apiService.createFoodEntry(newEntry);
         await fetchEntries(); // Refresh the list
-        return response.entry;
+        return response && typeof response === 'object' && 'entry' in response 
+          ? response.entry as FoodEntry 
+          : null;
       } else {
         const entry = foodEntryService.addFoodEntry(newEntry);
         await fetchEntries(); // Refresh the list

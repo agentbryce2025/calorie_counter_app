@@ -1,0 +1,113 @@
+
+> calorie_counter_app@0.1.0 start
+> craco start
+
+(node:53630) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:53630) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Compiled with warnings.
+
+[eslint] 
+src/components/ApiTest.tsx
+  Line 3:13:   'apiService' is defined but never used                                                                                                            @typescript-eslint/no-unused-vars
+  Line 18:11:  'entries' is assigned a value but never used                                                                                                      @typescript-eslint/no-unused-vars
+  Line 138:6:  React Hook useEffect has a missing dependency: 'testApiHealth'. Either include it or remove the dependency array                                  react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has missing dependencies: 'testDeleteEndpoint' and 'testUpdateEndpoint'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/Dashboard.tsx
+  Line 26:23:  'setCalorieGoal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src/services/apiService.ts
+  Line 160:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/foodEntryService.ts
+  Line 134:9:  'end' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  Line 213:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/preferencesService.ts
+  Line 52:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/ApiTest.tsx
+  Line 3:13:   'apiService' is defined but never used                                                                                                            @typescript-eslint/no-unused-vars
+  Line 18:11:  'entries' is assigned a value but never used                                                                                                      @typescript-eslint/no-unused-vars
+  Line 138:6:  React Hook useEffect has a missing dependency: 'testApiHealth'. Either include it or remove the dependency array                                  react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has missing dependencies: 'testDeleteEndpoint' and 'testUpdateEndpoint'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/Dashboard.tsx
+  Line 26:23:  'setCalorieGoal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src/services/apiService.ts
+  Line 160:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/foodEntryService.ts
+  Line 134:9:  'end' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  Line 213:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/preferencesService.ts
+  Line 52:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+webpack compiled with 1 warning
+ERROR in src/hooks/useFoodEntries.ts:85:16
+TS18046: 'response' is of type 'unknown'.
+    83 |         const response = await apiService.createFoodEntry(newEntry);
+    84 |         await fetchEntries(); // Refresh the list
+  > 85 |         return response.entry;
+       |                ^^^^^^^^
+    86 |       } else {
+    87 |         const entry = foodEntryService.addFoodEntry(newEntry);
+    88 |         await fetchEntries(); // Refresh the list
+
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/ApiTest.tsx
+  Line 3:13:   'apiService' is defined but never used                                                                                                            @typescript-eslint/no-unused-vars
+  Line 18:11:  'entries' is assigned a value but never used                                                                                                      @typescript-eslint/no-unused-vars
+  Line 138:6:  React Hook useEffect has a missing dependency: 'testApiHealth'. Either include it or remove the dependency array                                  react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has missing dependencies: 'testDeleteEndpoint' and 'testUpdateEndpoint'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/Dashboard.tsx
+  Line 26:23:  'setCalorieGoal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src/services/apiService.ts
+  Line 160:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/foodEntryService.ts
+  Line 134:9:  'end' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  Line 213:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/preferencesService.ts
+  Line 52:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/ApiTest.tsx
+  Line 3:13:   'apiService' is defined but never used                                                                                                            @typescript-eslint/no-unused-vars
+  Line 18:11:  'entries' is assigned a value but never used                                                                                                      @typescript-eslint/no-unused-vars
+  Line 138:6:  React Hook useEffect has a missing dependency: 'testApiHealth'. Either include it or remove the dependency array                                  react-hooks/exhaustive-deps
+  Line 149:6:  React Hook useEffect has missing dependencies: 'testDeleteEndpoint' and 'testUpdateEndpoint'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src/components/Dashboard.tsx
+  Line 26:23:  'setCalorieGoal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+src/services/apiService.ts
+  Line 160:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/foodEntryService.ts
+  Line 134:9:  'end' is assigned a value but never used                        @typescript-eslint/no-unused-vars
+  Line 213:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+src/services/preferencesService.ts
+  Line 52:1:  Assign object to a variable before exporting as module default  import/no-anonymous-default-export
+
+webpack compiled with 1 warning
+No issues found.

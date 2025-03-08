@@ -1,0 +1,28 @@
+
+> calorie-counter-backend@1.0.0 start
+> node dist/server.js
+
+Server is running on port 5005
+Using MongoDB Memory Server at: mongodb://127.0.0.1:61010/
+Authentication error: JsonWebTokenError: jwt malformed
+    at module.exports [as verify] (/home/computeruse/calorie_counter_app/backend/node_modules/jsonwebtoken/verify.js:70:17)
+    at authenticate (/home/computeruse/calorie_counter_app/backend/dist/middleware/auth.js:24:48)
+    at Layer.handle [as handle_request] (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:328:13)
+    at /home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:280:10)
+    at Function.handle (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:175:3)
+    at router (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:47:12)
+    at Layer.handle [as handle_request] (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/layer.js:95:5)
+Authentication error: JsonWebTokenError: jwt malformed
+    at module.exports [as verify] (/home/computeruse/calorie_counter_app/backend/node_modules/jsonwebtoken/verify.js:70:17)
+    at authenticate (/home/computeruse/calorie_counter_app/backend/dist/middleware/auth.js:24:48)
+    at Layer.handle [as handle_request] (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:328:13)
+    at /home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:280:10)
+    at Function.handle (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:175:3)
+    at router (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/index.js:47:12)
+    at Layer.handle [as handle_request] (/home/computeruse/calorie_counter_app/backend/node_modules/express/lib/router/layer.js:95:5)

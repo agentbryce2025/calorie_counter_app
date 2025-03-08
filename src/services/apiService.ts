@@ -1,6 +1,6 @@
 import { getAuthToken } from './authService';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5005/api';
 
 // Custom error class for API errors
 export class ApiError extends Error {
