@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { format } from 'date-fns';
 import { MealPlanFormData, MealItem } from './MealPlanForm';
+import SocialSharing from '../SocialSharing';
 
 interface MealPlanDetailProps {
   plan: MealPlanFormData;
@@ -75,6 +76,15 @@ const MealPlanDetail: React.FC<MealPlanDetailProps> = ({ plan, onBack, onEdit })
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-800">{plan.title}</h2>
           <div className="flex space-x-2">
+            <SocialSharing
+              mealPlan={{
+                name: plan.title,
+                totalCalories: nutritionTotals.calories,
+                days: uniqueDaysCount
+              }}
+              hashtags={["mealplan", "nutrition", "healthyeating"]}
+              showLabel={false}
+            />
             <button
               onClick={onBack}
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"

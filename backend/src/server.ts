@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import authRoutes from './routes/authRoutes';
 import foodEntryRoutes from './routes/foodEntryRoutes';
 import userPreferencesRoutes from './routes/userPreferencesRoutes';
+import exportRoutes from './routes/exportRoutes';
+import adminRoutes from './routes/adminRoutes';
 import { connectDB } from './config/db';
 import { setupSwagger } from './config/swagger';
 import { apiLimiter, authLimiter } from './middleware/rateLimit';
@@ -39,6 +41,8 @@ app.get('/api/health', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/food-entries', apiLimiter, foodEntryRoutes);
 app.use('/api/preferences', apiLimiter, userPreferencesRoutes);
+app.use('/api/export', apiLimiter, exportRoutes);
+app.use('/api/admin', apiLimiter, adminRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -8,6 +8,9 @@ export interface IUser extends Document {
   dailyCalorieGoal: number;
   createdAt: Date;
   updatedAt: Date;
+  isAdmin: boolean;
+  isActive: boolean;
+  lastLoginDate?: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -35,6 +38,18 @@ const userSchema = new Schema<IUser>({
   dailyCalorieGoal: {
     type: Number,
     default: 2000
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  lastLoginDate: {
+    type: Date,
+    default: Date.now
   }
 },
 {

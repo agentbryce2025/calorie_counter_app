@@ -68,9 +68,17 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
+    // Update lastLoginDate
+    user.lastLoginDate = new Date();
+    await user.save();
+
     // Generate JWT token
     const token = jwt.sign(
-      { id: user._id },
+      { 
+        id: user._id,
+        isAdmin: user.isAdmin,
+        isActive: user.isActive
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -80,7 +88,9 @@ export const login = async (req: Request, res: Response) => {
       id: user._id,
       username: user.username,
       email: user.email,
-      dailyCalorieGoal: user.dailyCalorieGoal
+      dailyCalorieGoal: user.dailyCalorieGoal,
+      isAdmin: user.isAdmin,
+      isActive: user.isActive
     };
 
     res.status(200).json({
@@ -117,7 +127,9 @@ export const getProfile = async (req: Request, res: Response) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        dailyCalorieGoal: user.dailyCalorieGoal
+        dailyCalorieGoal: user.dailyCalorieGoal,
+        isAdmin: user.isAdmin,
+        isActive: user.isActive
       }
     });
   } catch (error) {

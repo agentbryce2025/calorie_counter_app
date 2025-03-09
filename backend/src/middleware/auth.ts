@@ -40,6 +40,14 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       });
     }
 
+    // Check if user account is active
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been deactivated. Please contact an administrator.'
+      });
+    }
+
     // Attach user to request object
     req.user = user;
     next();

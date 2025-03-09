@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format, startOfToday } from 'date-fns';
+import { format, startOfToday, subDays } from 'date-fns';
 import { CalorieChart } from './ui/chart';
 import FoodEntryForm from './ui/food-entry-form';
 import ProgressBar from './ui/progress-bar';
@@ -10,7 +10,8 @@ import ErrorMessage from './ui/ErrorMessage';
 import NutritionChart from './NutritionChart';
 import TrendsChart from './TrendsChart';
 import ExportModal from './ExportModal';
-import { DownloadIcon } from '@radix-ui/react-icons';
+import SocialSharing from './SocialSharing';
+import { DownloadIcon, Share1Icon } from '@radix-ui/react-icons';
 import * as foodEntryService from '../services/foodEntryService';
 import * as preferencesService from '../services/preferencesService';
 import useFoodEntries from '../hooks/useFoodEntries';
@@ -31,6 +32,7 @@ const Dashboard: React.FC = () => {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [calorieGoal, setCalorieGoal] = useState<number>(preferencesService.getDailyCalorieGoal());
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [weeklyEntries, setWeeklyEntries] = useState<any[]>([]);
   
   // Fetch weekly and monthly data
   useEffect(() => {
@@ -39,6 +41,24 @@ const Dashboard: React.FC = () => {
     
     setWeeklyData(weekly);
     setMonthlyData(monthly);
+    
+    // Get the food entries for the past week for sharing
+    const fetchWeeklyEntries = async () => {
+      try {
+        // Get entries for the past 7 days 
+        const entries = [];
+        for (let i = 0; i < 7; i++) {
+          const date = subDays(selectedDate, i);
+          const dailyEntries = await foodEntryService.getFoodEntriesByDate(date);
+          entries.push(...dailyEntries);
+        }
+        setWeeklyEntries(entries);
+      } catch (error) {
+        console.error("Error fetching weekly entries:", error);
+      }
+    };
+    
+    fetchWeeklyEntries();
   }, [selectedDate, calorieGoal, foodEntries]);
   
   const handleAddFood = async (food: { name: string; calories: number; timestamp: string; mealType: string; carbs?: number; protein?: number; fat?: number }) => {
@@ -113,9 +133,20 @@ const Dashboard: React.FC = () => {
             />
           </div>
           
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-            Weekly Overview
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Weekly Overview
+            </h3>
+            <div className="flex gap-2">
+              <SocialSharing
+                foodEntries={weeklyEntries}
+                period="week"
+                hashtags={["caloriecounter", "nutrition", "weightloss"]}
+                showLabel={false}
+                className="inline-flex"
+              />
+            </div>
+          </div>
           
           <CalorieChart data={weeklyData} />
         </div>
