@@ -4,6 +4,7 @@ import App from './App';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ApiTestPage from './pages/ApiTestPage';
+import MealPlanningPage from './pages/MealPlanningPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -29,6 +30,14 @@ const AppRouter: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <ApiTestPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meal-planning"
+              element={
+                <ProtectedRoute>
+                  <MealPlanningPage />
                 </ProtectedRoute>
               }
             />

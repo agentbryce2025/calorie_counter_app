@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import authRoutes from './routes/authRoutes';
 import foodEntryRoutes from './routes/foodEntryRoutes';
+import userPreferencesRoutes from './routes/userPreferencesRoutes';
 import { connectDB } from './config/db';
 import { setupSwagger } from './config/swagger';
 import { apiLimiter, authLimiter } from './middleware/rateLimit';
@@ -37,6 +38,7 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Apply routes with rate limiting
 app.use('/api/auth', authRoutes);
 app.use('/api/food-entries', apiLimiter, foodEntryRoutes);
+app.use('/api/preferences', apiLimiter, userPreferencesRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
