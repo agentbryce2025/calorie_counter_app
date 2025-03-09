@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  # Backend API service
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5005:5005"
+    env_file:
+      - ./backend/.env
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+    
+  # Frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - api
+  
+  # MongoDB service (for development/testing only)
+  # In production, you'd typically use a managed MongoDB service
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
