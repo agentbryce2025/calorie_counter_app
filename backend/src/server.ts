@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import foodEntryRoutes from './routes/foodEntryRoutes';
 import { connectDB } from './config/db';
+import { setupSwagger } from './config/swagger';
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +19,9 @@ connectDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Setup Swagger documentation
+setupSwagger(app);
 
 // Basic route for testing
 app.get('/api/health', (req: Request, res: Response) => {

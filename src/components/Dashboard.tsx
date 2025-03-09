@@ -7,12 +7,16 @@ import CalendarView from './ui/calendar-view';
 import DailyTimeline from './ui/daily-timeline';
 import ApiStats from './ApiStats';
 import ErrorMessage from './ui/ErrorMessage';
+import NutritionChart from './NutritionChart';
+import TrendsChart from './TrendsChart';
 import * as foodEntryService from '../services/foodEntryService';
 import * as preferencesService from '../services/preferencesService';
 import useFoodEntries from '../hooks/useFoodEntries';
+import { useToast } from '../contexts/ToastContext';
 
 const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
+  const { showToast } = useToast();
   const { 
     entries: foodEntries, 
     addEntry, 
@@ -34,12 +38,22 @@ const Dashboard: React.FC = () => {
     setMonthlyData(monthly);
   }, [selectedDate, calorieGoal, foodEntries]);
   
-  const handleAddFood = async (food: { name: string; calories: number; timestamp: string; mealType: string }) => {
-    await addEntry(food);
+  const handleAddFood = async (food: { name: string; calories: number; timestamp: string; mealType: string; carbs?: number; protein?: number; fat?: number }) => {
+    try {
+      await addEntry(food);
+      showToast(`Added ${food.name} to your food entries`, 'success');
+    } catch (err) {
+      showToast(`Failed to add food entry: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+    }
   };
   
   const handleDeleteEntry = async (id: string) => {
-    await deleteEntry(id);
+    try {
+      await deleteEntry(id);
+      showToast('Food entry deleted successfully', 'success');
+    } catch (err) {
+      showToast(`Failed to delete entry: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+    }
   };
   
   const handleDateSelect = (date: Date) => {
@@ -120,6 +134,42 @@ const Dashboard: React.FC = () => {
         />
         
         <ApiStats darkMode={false} />
+      </div>
+
+      {/* Enhanced Analytics Section - Full width */}
+      <div className="col-span-full mt-6">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+          <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-4">
+            Nutritional Analysis
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Macronutrient Breakdown
+              </h3>
+              <div className="h-64">
+                <NutritionChart 
+                  foodEntries={foodEntries} 
+                  darkMode={false} 
+                />
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Nutrient Trends (14 Days)
+              </h3>
+              <div className="h-64">
+                <TrendsChart 
+                  foodEntries={foodEntries} 
+                  darkMode={false} 
+                  days={14}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
