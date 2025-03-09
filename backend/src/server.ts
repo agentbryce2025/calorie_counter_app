@@ -1,10 +1,12 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
 import authRoutes from './routes/authRoutes';
 import foodEntryRoutes from './routes/foodEntryRoutes';
 import { connectDB } from './config/db';
 import { setupSwagger } from './config/swagger';
+import { apiLimiter, authLimiter } from './middleware/rateLimit';
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +21,10 @@ connectDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(helmet()); // Add various HTTP headers for security
+
+// Apply rate limiters to specific routes
+app.use('/api/auth', authLimiter); // Stricter limit for auth endpoints
 
 // Setup Swagger documentation
 setupSwagger(app);
@@ -28,9 +34,9 @@ app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'API is running' });
 });
 
-// Apply routes
+// Apply routes with rate limiting
 app.use('/api/auth', authRoutes);
-app.use('/api/food-entries', foodEntryRoutes);
+app.use('/api/food-entries', apiLimiter, foodEntryRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

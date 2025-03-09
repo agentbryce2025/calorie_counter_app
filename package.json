@@ -19,6 +19,8 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "date-fns": "^4.1.0",
+    "pdfmake": "^0.2.18",
+    "quagga": "^0.12.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.30.0",

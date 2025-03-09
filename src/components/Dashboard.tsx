@@ -9,6 +9,8 @@ import ApiStats from './ApiStats';
 import ErrorMessage from './ui/ErrorMessage';
 import NutritionChart from './NutritionChart';
 import TrendsChart from './TrendsChart';
+import ExportModal from './ExportModal';
+import { DownloadIcon } from '@radix-ui/react-icons';
 import * as foodEntryService from '../services/foodEntryService';
 import * as preferencesService from '../services/preferencesService';
 import useFoodEntries from '../hooks/useFoodEntries';
@@ -28,6 +30,7 @@ const Dashboard: React.FC = () => {
   const [weeklyData, setWeeklyData] = useState<{ name: string; calories: number }[]>([]);
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [calorieGoal, setCalorieGoal] = useState<number>(preferencesService.getDailyCalorieGoal());
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   
   // Fetch weekly and monthly data
   useEffect(() => {
@@ -89,6 +92,12 @@ const Dashboard: React.FC = () => {
             <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
               {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </h2>
+            <button
+              onClick={() => setExportModalOpen(true)}
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <DownloadIcon className="mr-2" /> Export Data
+            </button>
           </div>
           
           <div className="mb-6">
@@ -171,6 +180,9 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Export Modal */}
+      <ExportModal open={exportModalOpen} onOpenChange={setExportModalOpen} />
     </div>
   );
 };
