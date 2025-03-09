@@ -1,6 +1,27 @@
-# Getting Started with Create React App
+# Calorie Counter App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive calorie tracking application with offline capabilities, built with React, TypeScript, and modern web technologies.
+
+## Features
+
+- **Calorie Tracking**: Log food entries with detailed nutritional information
+- **Advanced Analytics**: Visualize your nutritional data with interactive charts
+- **Barcode Scanning**: Quickly add packaged foods by scanning barcodes
+- **Voice Input**: Add food entries using natural voice commands
+- **Export Functionality**: Export your data in CSV or PDF formats
+- **Meal Planning**: Create and manage meal plans for better nutrition
+- **Social Sharing**: Share your progress and achievements
+- **Offline Support**: Use the app even when you're offline
+- **Responsive Design**: Works on mobile and desktop devices
+
+## Technical Details
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and enhanced with:
+
+- **TypeScript** for type safety
+- **Tailwind CSS** for styling
+- **Service Workers** for offline capability
+- **Progressive Web App (PWA)** features
 
 ## Available Scripts
 
@@ -38,6 +59,26 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Offline Capability
+
+The app includes comprehensive offline support:
+
+- **Service Workers**: Cache assets and API responses for offline use
+- **Offline Indicator**: Clear visual indication when you're offline
+- **Fallback Content**: Graceful degradation when network is unavailable
+- **Data Persistence**: Local storage backup when API is unreachable
+- **Update Notifications**: Inform users when a new version is available
+
+For more details, see the [OFFLINE_CAPABILITY.md](./OFFLINE_CAPABILITY.md) documentation.
+
+## Project Status
+
+Check the current project status and upcoming features in [PROJECT_STATUS.md](./PROJECT_STATUS.md).
+
+## Development Summary
+
+For a comprehensive overview of development progress, see [DEVELOPMENT_SUMMARY.md](./DEVELOPMENT_SUMMARY.md).
 
 ## Learn More
 
