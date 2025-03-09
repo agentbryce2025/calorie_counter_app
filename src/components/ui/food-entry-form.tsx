@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons'; // Changed from ScannerIcon which doesn't exist
+import { Plus, Search } from 'lucide-react';
 import BarcodeScannerModal from './BarcodeScannerModal';
 
 interface FoodEntryFormProps {
@@ -12,9 +12,10 @@ interface FoodEntryFormProps {
     protein?: number;
     fat?: number; 
   }) => void;
+  darkMode?: boolean;
 }
 
-export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
+export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood, darkMode = true }) => {
   const [food, setFood] = useState('');
   const [calories, setCalories] = useState('');
   const [mealType, setMealType] = useState('breakfast');
@@ -23,6 +24,7 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
   const [fat, setFat] = useState('');
   const [showNutrition, setShowNutrition] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +32,8 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
     if (!food.trim() || !calories.trim()) {
       return;
     }
+    
+    setIsSubmitting(true);
     
     const foodEntry = {
       name: food,
@@ -50,6 +54,7 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
     setProtein('');
     setFat('');
     setShowNutrition(false);
+    setIsSubmitting(false);
   };
   
   const handleScannerResult = (product: { 
@@ -71,76 +76,84 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow space-y-4">
-      <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Add Food Entry</h2>
+    <div className="p-6">
+      <h3 className="text-xl font-semibold mb-4">Add Food</h3>
       
-      <div>
-        <label htmlFor="food" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Food Name
-        </label>
-        <div className="mt-1 flex rounded-md shadow-sm">
-          <input
-            type="text"
-            id="food"
-            value={food}
-            onChange={(e) => setFood(e.target.value)}
-            className="flex-1 min-w-0 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
-            placeholder="e.g., Banana"
-            required
-          />
-          <button
-            type="button"
-            onClick={() => setScannerOpen(true)}
-            className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-r-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
-          </button>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="food" className="block text-sm font-medium mb-1 text-gray-200">
+            Food Name
+          </label>
+          <div className="flex rounded-md">
+            <input
+              type="text"
+              id="food"
+              value={food}
+              onChange={(e) => setFood(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-l-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="E.g., Grilled Chicken Salad"
+              required
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              onClick={() => setScannerOpen(true)}
+              className="inline-flex items-center justify-center px-3 py-2 rounded-r-md bg-gray-800 border border-l-0 border-gray-700 text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+          </div>
         </div>
-      </div>
-      
-      <div>
-        <label htmlFor="calories" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Calories
-        </label>
-        <input
-          type="number"
-          id="calories"
-          value={calories}
-          onChange={(e) => setCalories(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
-          placeholder="e.g., 105"
-          min="0"
-          required
-        />
-      </div>
-      
-      <div>
-        <label htmlFor="mealType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Meal Type
-        </label>
-        <select
-          id="mealType"
-          value={mealType}
-          onChange={(e) => setMealType(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
-        >
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-          <option value="snack">Snack</option>
-        </select>
-      </div>
-      
-      {/* Additional nutritional information fields */}
-      {showNutrition ? (
-        <div className="space-y-4 border-t pt-4 border-gray-200 dark:border-gray-700">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Nutritional Information
-          </h3>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="calories" className="block text-sm font-medium mb-1 text-gray-200">
+              Calories
+            </label>
+            <input
+              type="number"
+              id="calories"
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
+              className="w-full px-3 py-2 rounded-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="E.g., 350"
+              min="0"
+              required
+              disabled={isSubmitting}
+            />
+          </div>
           
-          <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="mealType" className="block text-sm font-medium mb-1 text-gray-200">
+              Meal Type
+            </label>
+            <select
+              id="mealType"
+              value={mealType}
+              onChange={(e) => setMealType(e.target.value)}
+              className="w-full px-3 py-2 rounded-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isSubmitting}
+            >
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner">Dinner</option>
+              <option value="snack">Snack</option>
+            </select>
+          </div>
+        </div>
+        
+        <button
+          type="button"
+          onClick={() => setShowNutrition(!showNutrition)}
+          className="inline-flex items-center text-sm text-blue-400 hover:text-blue-300"
+        >
+          {showNutrition ? '- Hide' : '+ Add'} nutritional details
+        </button>
+        
+        {showNutrition && (
+          <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-800">
             <div>
-              <label htmlFor="carbs" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="carbs" className="block text-sm font-medium mb-1 text-gray-200">
                 Carbs (g)
               </label>
               <input
@@ -148,15 +161,16 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
                 id="carbs"
                 value={carbs}
                 onChange={(e) => setCarbs(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 rounded-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="0"
                 min="0"
                 step="0.1"
+                disabled={isSubmitting}
               />
             </div>
             
             <div>
-              <label htmlFor="protein" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="protein" className="block text-sm font-medium mb-1 text-gray-200">
                 Protein (g)
               </label>
               <input
@@ -164,15 +178,16 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
                 id="protein"
                 value={protein}
                 onChange={(e) => setProtein(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 rounded-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="0"
                 min="0"
                 step="0.1"
+                disabled={isSubmitting}
               />
             </div>
             
             <div>
-              <label htmlFor="fat" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="fat" className="block text-sm font-medium mb-1 text-gray-200">
                 Fat (g)
               </label>
               <input
@@ -180,38 +195,25 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
                 id="fat"
                 value={fat}
                 onChange={(e) => setFat(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 rounded-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="0"
                 min="0"
                 step="0.1"
+                disabled={isSubmitting}
               />
             </div>
           </div>
-          
-          <button
-            type="button"
-            onClick={() => setShowNutrition(false)}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-          >
-            Hide nutrition details
-          </button>
-        </div>
-      ) : (
+        )}
+        
         <button
-          type="button"
-          onClick={() => setShowNutrition(true)}
-          className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+          type="submit"
+          disabled={isSubmitting || !food || !calories || !mealType}
+          className="w-full py-2 px-4 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          + Add nutrition details (carbs, protein, fat)
+          <Plus className="mr-2 h-4 w-4" />
+          {isSubmitting ? 'Adding...' : 'Add Food'}
         </button>
-      )}
-      
-      <button
-        type="submit"
-        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      >
-        Add Food
-      </button>
+      </form>
       
       {/* Barcode Scanner Modal */}
       {scannerOpen && (
@@ -221,7 +223,7 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
           onProductFound={handleScannerResult}
         />
       )}
-    </form>
+    </div>
   );
 };
 
