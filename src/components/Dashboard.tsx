@@ -100,59 +100,62 @@ const Dashboard: React.FC = () => {
       {/* Loading indicator */}
       {loading && (
         <div className="col-span-full flex justify-center items-center p-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-          <span className="ml-2">Loading data...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted-foreground">Loading data...</span>
         </div>
       )}
 
       {/* Left column */}
       <div className="md:col-span-2 space-y-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100">
+        <div className="bg-card rounded-lg border shadow-sm p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <h2 className="text-3xl font-bold tracking-tight">
               {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </h2>
             <button
               onClick={() => setExportModalOpen(true)}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
             >
-              <DownloadIcon className="mr-2" /> Export Data
+              <DownloadIcon className="mr-2 h-4 w-4" /> Export Data
             </button>
           </div>
           
-          <div className="mb-6">
-            <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600 dark:text-gray-400">Daily Progress</span>
-              <span className="text-gray-900 dark:text-gray-100">
+          <div className="mb-8">
+            <div className="flex justify-between items-center text-sm mb-2">
+              <span className="text-muted-foreground font-medium">Daily Progress</span>
+              <span className="font-semibold">
                 {totalCalories} / {calorieGoal} calories
               </span>
             </div>
             <ProgressBar 
               value={totalCalories} 
               max={calorieGoal} 
+              className="h-3"
             />
           </div>
           
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <h3 className="text-xl font-semibold tracking-tight">
               Weekly Overview
             </h3>
             <div className="flex gap-2">
               <SocialSharing
                 foodEntries={weeklyEntries}
                 period="week"
-                hashtags={["caloriecounter", "nutrition", "weightloss"]}
+                hashtags={["caloriecounter", "nutrition", "health"]}
                 showLabel={false}
                 className="inline-flex"
               />
             </div>
           </div>
           
-          <CalorieChart data={weeklyData} />
+          <div className="rounded-md border bg-card p-1">
+            <CalorieChart data={weeklyData} />
+          </div>
         </div>
         
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+        <div className="bg-card rounded-lg border shadow-sm p-6">
+          <h3 className="text-xl font-semibold tracking-tight mb-4">
             Today's Food Entries
           </h3>
           
@@ -160,35 +163,56 @@ const Dashboard: React.FC = () => {
             entries={foodEntries}
             onDeleteEntry={handleDeleteEntry}
           />
+
+          {foodEntries.length === 0 && (
+            <div className="py-12 text-center">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                  <rect width="18" height="18" x="3" y="3" rx="2" />
+                  <path d="M8 12h8" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium mb-1">No food entries yet</h3>
+              <p className="text-muted-foreground">Add your first meal to start tracking</p>
+            </div>
+          )}
         </div>
       </div>
       
       {/* Right column */}
       <div className="space-y-6">
-        <FoodEntryForm onAddFood={handleAddFood} />
+        <div className="bg-card rounded-lg border shadow-sm">
+          <FoodEntryForm onAddFood={handleAddFood} />
+        </div>
         
-        <CalendarView 
-          currentDate={selectedDate}
-          foodEntries={monthlyData}
-          onSelectDate={handleDateSelect}
-        />
+        <div className="bg-card rounded-lg border shadow-sm p-6">
+          <h3 className="text-lg font-semibold tracking-tight mb-4">Calendar</h3>
+          <CalendarView 
+            currentDate={selectedDate}
+            foodEntries={monthlyData}
+            onSelectDate={handleDateSelect}
+          />
+        </div>
         
-        <ApiStats darkMode={false} />
+        <div className="bg-card rounded-lg border shadow-sm p-6">
+          <h3 className="text-lg font-semibold tracking-tight mb-4">API Status</h3>
+          <ApiStats darkMode={false} />
+        </div>
       </div>
 
       {/* Enhanced Analytics Section - Full width */}
-      <div className="col-span-full mt-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-4">
+      <div className="col-span-full">
+        <div className="bg-card rounded-lg border shadow-sm p-6">
+          <h2 className="text-2xl font-semibold tracking-tight mb-6">
             Nutritional Analysis
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">
                 Macronutrient Breakdown
               </h3>
-              <div className="h-64">
+              <div className="rounded-md border bg-card p-4 h-64">
                 <NutritionChart 
                   foodEntries={foodEntries} 
                   darkMode={false} 
@@ -196,11 +220,11 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">
                 Nutrient Trends (14 Days)
               </h3>
-              <div className="h-64">
+              <div className="rounded-md border bg-card p-4 h-64">
                 <TrendsChart 
                   foodEntries={foodEntries} 
                   darkMode={false} 

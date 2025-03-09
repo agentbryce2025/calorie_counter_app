@@ -1,5 +1,6 @@
 import React from 'react';
 import * as Progress from '@radix-ui/react-progress';
+import { cn } from '../../lib/utils';
 
 interface ProgressBarProps {
   value: number;
@@ -10,18 +11,31 @@ interface ProgressBarProps {
 export const ProgressBar: React.FC<ProgressBarProps> = ({ value, max, className }) => {
   const percentage = Math.min(Math.round((value / max) * 100), 100);
   
+  // Determine color based on percentage
+  let colorClass = "bg-green-500"; // Default green
+  
+  if (percentage > 85) {
+    colorClass = "bg-yellow-500";
+  }
+  
+  if (percentage >= 100) {
+    colorClass = "bg-red-500";
+  }
+  
   return (
     <Progress.Root 
-      className={`relative overflow-hidden bg-gray-200 dark:bg-gray-700 rounded-full w-full h-4 ${className || ''}`}
+      className={cn(
+        "relative overflow-hidden bg-secondary rounded-full w-full h-4 shadow-sm",
+        className
+      )}
       value={percentage}
     >
       <Progress.Indicator
-        className={`h-full transition-transform duration-300 ease-in-out rounded-full ${
-          percentage > 100 
-            ? 'bg-red-500 dark:bg-red-600' 
-            : 'bg-blue-500 dark:bg-blue-600'
-        }`}
-        style={{ width: `${percentage}%` }}
+        className={cn(
+          "h-full w-full transition-all duration-500 ease-in-out rounded-full",
+          colorClass
+        )}
+        style={{ transform: `translateX(-${100 - percentage}%)` }}
       />
     </Progress.Root>
   );
