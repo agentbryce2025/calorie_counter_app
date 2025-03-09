@@ -2,17 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import OfflineIndicator from './components/OfflineIndicator';
-import { applyDarkModeToDocument } from './services/preferencesService';
+import { ThemeProvider } from './components/theme-provider';
 import { useBackgroundSync } from './hooks/useBackgroundSync';
 
 function App() {
   const [serviceWorkerUpdated, setServiceWorkerUpdated] = useState(false);
   const { isBackgroundSyncing, pendingSyncCount, triggerSync } = useBackgroundSync();
 
-  // Apply dark mode on initial load
-  useEffect(() => {
-    applyDarkModeToDocument();
-  }, []);
+  // Dark mode is now handled by ThemeProvider
 
   // Listen for service worker updates
   useEffect(() => {
@@ -29,9 +26,10 @@ function App() {
   }, []);
 
   return (
-    <Layout>
-      <Dashboard />
-      <OfflineIndicator pendingSyncCount={pendingSyncCount} onSyncClick={triggerSync} />
+    <ThemeProvider defaultTheme="dark" attribute="class">
+      <Layout>
+        <Dashboard />
+        <OfflineIndicator pendingSyncCount={pendingSyncCount} onSyncClick={triggerSync} />
       
       {/* Service Worker Update Notification */}
       {serviceWorkerUpdated && (
@@ -67,6 +65,7 @@ function App() {
         </div>
       )}
     </Layout>
+    </ThemeProvider>
   );
 }
 

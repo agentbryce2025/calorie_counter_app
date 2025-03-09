@@ -28,9 +28,19 @@ class SocialSharingService {
     const totalFat = entries.reduce((sum, entry) => sum + (entry.fat || 0), 0);
 
     // Format the date range
-    const dates = entries.map(entry => new Date(entry.date));
-    const startDate = new Date(Math.min(...dates.map(d => d.getTime()))).toLocaleDateString();
-    const endDate = new Date(Math.max(...dates.map(d => d.getTime()))).toLocaleDateString();
+    const dates = entries
+      .filter(entry => entry.date) // Filter out entries without dates
+      .map(entry => new Date(entry.date as string));
+      
+    // Default to today's date if no valid dates are available
+    let startDate = new Date().toLocaleDateString();
+    let endDate = startDate;
+    
+    // Only calculate date range if we have valid dates
+    if (dates.length > 0) {
+      startDate = new Date(Math.min(...dates.map(d => d.getTime()))).toLocaleDateString();
+      endDate = new Date(Math.max(...dates.map(d => d.getTime()))).toLocaleDateString();
+    }
     const dateRange = startDate === endDate ? startDate : `${startDate} to ${endDate}`;
 
     return `Check out my ${period} nutrition summary from ${dateRange}!

@@ -227,7 +227,8 @@ class VoiceInputService implements VoiceRecognitionService {
     
     // Remove the already extracted parts (mealType, calories, quantity)
     if (result.mealType) {
-      processedText = processedText.replace(mealTypePatterns[result.mealType], '');
+      const mealType = result.mealType as keyof typeof mealTypePatterns;
+      processedText = processedText.replace(mealTypePatterns[mealType], '');
     }
     
     if (caloriesMatch) {

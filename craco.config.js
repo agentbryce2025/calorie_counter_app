@@ -1,4 +1,3 @@
-const { InjectManifest } = require('workbox-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -10,9 +9,10 @@ module.exports = {
       ],
     },
   },
+  // Temporarily disable service worker config for testing
   webpack: {
     configure: (webpackConfig, { env, paths }) => {
-      // Only add InjectManifest in production build
+      // Remove any service worker plugins for testing purposes
       if (env === 'production') {
         const workboxPluginIndex = webpackConfig.plugins.findIndex(
           (plugin) => plugin.constructor.name === 'GenerateSW'
@@ -22,16 +22,6 @@ module.exports = {
         if (workboxPluginIndex !== -1) {
           webpackConfig.plugins.splice(workboxPluginIndex, 1);
         }
-
-        // Add InjectManifest plugin
-        webpackConfig.plugins.push(
-          new InjectManifest({
-            swSrc: path.resolve(__dirname, 'src/service-worker.ts'),
-            swDest: 'service-worker.js',
-            exclude: [/\.map$/, /asset-manifest\.json$/, /LICENSE/],
-            maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-          })
-        );
       }
 
       return webpackConfig;

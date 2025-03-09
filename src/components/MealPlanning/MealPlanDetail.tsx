@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { format } from 'date-fns';
+// Use the types from MealPlanForm instead
 import { MealPlanFormData, MealItem } from './MealPlanForm';
 import SocialSharing from '../SocialSharing';
 

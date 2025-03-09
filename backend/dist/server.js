@@ -6,9 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const helmet_1 = __importDefault(require("helmet"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const foodEntryRoutes_1 = __importDefault(require("./routes/foodEntryRoutes"));
+const userPreferencesRoutes_1 = __importDefault(require("./routes/userPreferencesRoutes"));
+const exportRoutes_1 = __importDefault(require("./routes/exportRoutes"));
+const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
 const db_1 = require("./config/db");
+const swagger_1 = require("./config/swagger");
+const rateLimit_1 = require("./middleware/rateLimit");
 // Load environment variables
 dotenv_1.default.config();
 // Initialize express app
@@ -19,13 +25,21 @@ const PORT = process.env.PORT || 5005;
 // Middleware
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
+app.use((0, helmet_1.default)()); // Add various HTTP headers for security
+// Apply rate limiters to specific routes
+app.use('/api/auth', rateLimit_1.authLimiter); // Stricter limit for auth endpoints
+// Setup Swagger documentation
+(0, swagger_1.setupSwagger)(app);
 // Basic route for testing
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'API is running' });
 });
-// Apply routes
+// Apply routes with rate limiting
 app.use('/api/auth', authRoutes_1.default);
-app.use('/api/food-entries', foodEntryRoutes_1.default);
+app.use('/api/food-entries', rateLimit_1.apiLimiter, foodEntryRoutes_1.default);
+app.use('/api/preferences', rateLimit_1.apiLimiter, userPreferencesRoutes_1.default);
+app.use('/api/export', rateLimit_1.apiLimiter, exportRoutes_1.default);
+app.use('/api/admin', rateLimit_1.apiLimiter, adminRoutes_1.default);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

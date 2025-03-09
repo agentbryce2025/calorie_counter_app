@@ -7,6 +7,18 @@ export interface FoodEntry {
   calories: number;
   timestamp: string;
   mealType: string;
+  // Add missing properties that are referenced in components
+  date?: string;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  nutritionalInfo?: {
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fiber?: number;
+    sugar?: number;
+  };
 }
 
 // Mock initial data

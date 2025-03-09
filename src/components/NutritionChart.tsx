@@ -49,9 +49,13 @@ const NutritionChart: React.FC<NutritionChartProps> = ({ foodEntries, darkMode }
   
   // Calculate total calories from macronutrients
   const calculateMacroCalories = () => {
-    const caloriesFromCarbs = data.find(item => item.name === NUTRIENT_LABELS.carbs)?.value * 4 || 0;
-    const caloriesFromProtein = data.find(item => item.name === NUTRIENT_LABELS.protein)?.value * 4 || 0;
-    const caloriesFromFat = data.find(item => item.name === NUTRIENT_LABELS.fat)?.value * 9 || 0;
+    const carbItem = data.find(item => item.name === NUTRIENT_LABELS.carbs);
+    const proteinItem = data.find(item => item.name === NUTRIENT_LABELS.protein);
+    const fatItem = data.find(item => item.name === NUTRIENT_LABELS.fat);
+    
+    const caloriesFromCarbs = carbItem ? carbItem.value * 4 : 0;
+    const caloriesFromProtein = proteinItem ? proteinItem.value * 4 : 0;
+    const caloriesFromFat = fatItem ? fatItem.value * 9 : 0;
     
     return {
       carbs: caloriesFromCarbs,

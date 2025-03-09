@@ -64,14 +64,23 @@ const login = async (req, res) => {
                 message: 'Invalid username or password'
             });
         }
+        // Update lastLoginDate
+        user.lastLoginDate = new Date();
+        await user.save();
         // Generate JWT token
-        const token = jsonwebtoken_1.default.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jsonwebtoken_1.default.sign({
+            id: user._id,
+            isAdmin: user.isAdmin,
+            isActive: user.isActive
+        }, JWT_SECRET, { expiresIn: '7d' });
         // Remove password from response
         const userResponse = {
             id: user._id,
             username: user.username,
             email: user.email,
-            dailyCalorieGoal: user.dailyCalorieGoal
+            dailyCalorieGoal: user.dailyCalorieGoal,
+            isAdmin: user.isAdmin,
+            isActive: user.isActive
         };
         res.status(200).json({
             success: true,
@@ -106,7 +115,9 @@ const getProfile = async (req, res) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                dailyCalorieGoal: user.dailyCalorieGoal
+                dailyCalorieGoal: user.dailyCalorieGoal,
+                isAdmin: user.isAdmin,
+                isActive: user.isActive
             }
         });
     }

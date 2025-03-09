@@ -32,68 +32,69 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const userSchema = new mongoose_1.Schema({
-    username: {
-        type: String,
+const UserPreferencesSchema = new mongoose_1.Schema({
+    userId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
-        unique: true,
-        trim: true,
-        minlength: 3,
-        maxlength: 30
+        unique: true
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true
-    },
-    password: {
-        type: String,
-        required: true,
-        minlength: 6
-    },
-    dailyCalorieGoal: {
+    calorieGoal: {
         type: Number,
         default: 2000
     },
-    isAdmin: {
-        type: Boolean,
-        default: false
+    macroGoals: {
+        protein: {
+            type: Number,
+            default: 150
+        },
+        carbs: {
+            type: Number,
+            default: 200
+        },
+        fat: {
+            type: Number,
+            default: 65
+        }
     },
-    isActive: {
+    mealTimes: {
+        breakfast: {
+            type: String,
+            default: '08:00'
+        },
+        lunch: {
+            type: String,
+            default: '12:00'
+        },
+        dinner: {
+            type: String,
+            default: '18:00'
+        },
+        snacks: {
+            type: [String],
+            default: ['10:30', '15:30']
+        }
+    },
+    dietaryRestrictions: {
+        type: [String],
+        default: []
+    },
+    theme: {
+        type: String,
+        enum: ['light', 'dark'],
+        default: 'light'
+    },
+    emailNotifications: {
         type: Boolean,
         default: true
     },
-    lastLoginDate: {
-        type: Date,
-        default: Date.now
+    weeklyReport: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true
 });
-// Hash password before saving
-userSchema.pre('save', async function (next) {
-    // Only hash the password if it has been modified (or is new)
-    if (!this.isModified('password'))
-        return next();
-    try {
-        const salt = await bcryptjs_1.default.genSalt(10);
-        this.password = await bcryptjs_1.default.hash(this.password, salt);
-        next();
-    }
-    catch (error) {
-        next(error);
-    }
-});
-// Method to compare password for login
-userSchema.methods.comparePassword = async function (candidatePassword) {
-    return bcryptjs_1.default.compare(candidatePassword, this.password);
-};
-exports.default = mongoose_1.default.model('User', userSchema);
+exports.default = mongoose_1.default.model('UserPreferences', UserPreferencesSchema);

@@ -13,6 +13,18 @@ export type FoodEntry = {
   calories: number;
   timestamp: string;
   mealType: string;
+  // Add missing properties that are used in components
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  date?: string;
+  nutritionalInfo?: {
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fiber?: number;
+    sugar?: number;
+  };
 };
 
 export type NewFoodEntry = Omit<FoodEntry, 'id'>;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScannerIcon } from '@radix-ui/react-icons';
+import { MagnifyingGlassIcon } from '@radix-ui/react-icons'; // Changed from ScannerIcon which doesn't exist
 import BarcodeScannerModal from './BarcodeScannerModal';
 
 interface FoodEntryFormProps {
@@ -93,7 +93,7 @@ export const FoodEntryForm: React.FC<FoodEntryFormProps> = ({ onAddFood }) => {
             onClick={() => setScannerOpen(true)}
             className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-r-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
-            <ScannerIcon className="h-5 w-5" aria-hidden="true" />
+            <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
       </div>

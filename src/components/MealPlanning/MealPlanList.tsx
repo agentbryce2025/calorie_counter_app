@@ -1,5 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
+// Use types from MealPlanForm instead
 import { MealPlanFormData } from './MealPlanForm';
 
 interface MealPlanListProps {

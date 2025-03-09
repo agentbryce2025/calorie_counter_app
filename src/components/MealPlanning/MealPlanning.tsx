@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import MealPlanForm, { MealPlanFormData } from './MealPlanForm';
+import MealPlanForm from './MealPlanForm';
 import MealPlanList from './MealPlanList';
 import MealPlanDetail from './MealPlanDetail';
+import { MealPlanFormData, MealItem } from './MealPlanForm';
 
 enum MealPlanningView {
   LIST = 'list',
@@ -80,18 +81,11 @@ const MealPlanning: React.FC = () => {
   const renderView = () => {
     switch (currentView) {
       case MealPlanningView.CREATE:
-        return (
-          <MealPlanForm 
-            onSubmit={handleCreatePlan} 
-          />
-        );
+        return <MealPlanForm onSubmit={handleCreatePlan} />;
       
       case MealPlanningView.EDIT:
         return selectedPlan ? (
-          <MealPlanForm 
-            onSubmit={handleUpdatePlan} 
-            initialData={selectedPlan}
-          />
+          <MealPlanForm onSubmit={handleUpdatePlan} initialData={selectedPlan} />
         ) : null;
       
       case MealPlanningView.DETAIL:

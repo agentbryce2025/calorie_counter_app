@@ -376,7 +376,7 @@ const FoodEntryForm = ({ darkMode, onAddFood }: FoodEntryFormProps) => {
                 </svg>
               </button>
             </div>
-            <BarcodeScanner onDetected={handleBarcodeDetect} />
+            <BarcodeScanner onDetected={handleBarcodeDetect} onClose={() => setShowScanner(false)} />
           </div>
         </div>
       )}
