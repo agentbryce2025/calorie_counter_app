@@ -1,20 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
-
-interface FoodItem {
-  id: number;
-  name: string;
-  calories: number;
-  time: Date;
-}
+import VirtualizedFoodList from './VirtualizedFoodList';
+import { FoodEntry } from '../services/foodEntryService';
 
 interface DailyDetailProps {
   darkMode: boolean;
   selectedDate: Date;
-  foods: FoodItem[];
+  foods: FoodEntry[];
   totalCalories: number;
   calorieGoal: number;
-  onDeleteFood?: (id: number) => void;
+  onDeleteFood?: (entry: FoodEntry) => void;
+  onEditFood?: (entry: FoodEntry) => void;
 }
 
 const DailyDetail: React.FC<DailyDetailProps> = ({
@@ -23,10 +19,27 @@ const DailyDetail: React.FC<DailyDetailProps> = ({
   foods,
   totalCalories,
   calorieGoal,
-  onDeleteFood
+  onDeleteFood,
+  onEditFood
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'calories' | 'timestamp' | 'mealType'>('timestamp');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
   const isOverGoal = totalCalories > calorieGoal;
   const percentOfGoal = Math.round((totalCalories / calorieGoal) * 100);
+  
+  // Handle sorting change
+  const handleSortChange = (field: 'name' | 'calories' | 'timestamp' | 'mealType') => {
+    if (field === sortBy) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field and default to ascending
+      setSortBy(field);
+      setSortDirection('asc');
+    }
+  };
   
   return (
     <div className={`rounded-lg p-4 ${darkMode ? 'bg-gray-800' : 'bg-white border'}`}>
@@ -69,44 +82,86 @@ const DailyDetail: React.FC<DailyDetailProps> = ({
         </div>
       </div>
       
-      <h3 className="text-lg font-semibold mb-2">Food Entries</h3>
-      {foods.length > 0 ? (
-        <div className={`overflow-x-auto ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded-lg`}>
-          <table className="min-w-full">
-            <thead>
-              <tr className={darkMode ? 'border-b border-gray-700' : 'border-b'}>
-                <th className="py-2 px-4 text-left">Food</th>
-                <th className="py-2 px-4 text-left">Calories</th>
-                <th className="py-2 px-4 text-left">Time</th>
-                {onDeleteFood && <th className="py-2 px-4 text-left">Actions</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {foods.map(food => (
-                <tr key={food.id} className={darkMode ? 'border-b border-gray-700' : 'border-b'}>
-                  <td className="py-2 px-4">{food.name}</td>
-                  <td className="py-2 px-4">{food.calories}</td>
-                  <td className="py-2 px-4">{format(food.time, 'h:mm a')}</td>
-                  {onDeleteFood && (
-                    <td className="py-2 px-4">
-                      <button 
-                        onClick={() => onDeleteFood(food.id)}
-                        className={`px-2 py-1 rounded-md text-sm ${darkMode ? 'bg-red-900 hover:bg-red-800' : 'bg-red-100 hover:bg-red-200'} text-red-600`}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold mb-2">Food Entries</h3>
+        
+        {/* Search and sort controls */}
+        <div className="flex flex-col md:flex-row justify-between mb-4 gap-2">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search food entries..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`p-2 w-full md:w-64 rounded-md ${
+                darkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  : 'bg-white border-gray-300 text-gray-800 placeholder-gray-400'
+              } border`}
+            />
+            <svg
+              className="absolute right-3 top-2.5 h-5 w-5 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          
+          <div className="flex gap-2">
+            <select
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value as any)}
+              className={`p-2 rounded-md border ${
+                darkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white' 
+                  : 'bg-white border-gray-300 text-gray-800'
+              }`}
+            >
+              <option value="timestamp">Time</option>
+              <option value="name">Name</option>
+              <option value="calories">Calories</option>
+              <option value="mealType">Meal Type</option>
+            </select>
+            
+            <button
+              onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+              className={`p-2 rounded-md border ${
+                darkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white' 
+                  : 'bg-white border-gray-300 text-gray-800'
+              }`}
+            >
+              {sortDirection === 'asc' ? '↑ Asc' : '↓ Desc'}
+            </button>
+          </div>
         </div>
-      ) : (
-        <p className={`p-4 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded-lg text-center`}>
-          No food entries for this day. Add your first meal!
-        </p>
-      )}
+        
+        {/* Virtualized food list */}
+        {foods.length > 0 ? (
+          <div className={`${darkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded-lg`}>
+            <VirtualizedFoodList
+              entries={foods}
+              onEdit={onEditFood}
+              onDelete={onDeleteFood}
+              searchTerm={searchTerm}
+              sortBy={sortBy}
+              sortDirection={sortDirection}
+              maxHeight={500}
+              className={darkMode ? 'text-white' : 'text-gray-800'}
+            />
+          </div>
+        ) : (
+          <p className={`p-4 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} rounded-lg text-center`}>
+            No food entries for this day. Add your first meal!
+          </p>
+        )}
+      </div>
     </div>
   );
 };
